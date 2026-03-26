@@ -59,6 +59,7 @@ private:
 	void OnSetSpeed(wxCommandEvent& event);
 	void OnSetSpeedCustom(wxCommandEvent& event);
 	void OnSetSize(wxCommandEvent& event);
+	void OnSetLCDDriver(wxCommandEvent& event);
 	
 	void OnDebugReset(wxCommandEvent& event);
 	void OnDebugOpen(wxCommandEvent& event);

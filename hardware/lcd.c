@@ -70,6 +70,26 @@ static void LCD_free(LCD_t *);
 u_char *LCD_update_image(LCD_t *lcd);
 
 #define NORMAL_DELAY 60		//tstates
+#define NT7564H_DELAY 20
+#define NEW_KINPO_DELAY 0
+
+void LCD_update_delay(LCD_t *lcd) {
+	switch (lcd->driver_type) {
+		case LCD_DRIVER_T6A04:
+			lcd->lcd_delay = NORMAL_DELAY;
+			break;
+		case LCD_DRIVER_NT7564H:
+			lcd->lcd_delay = NT7564H_DELAY;
+			break;
+		case LCD_DRIVER_NEW_KINPO:
+			lcd->lcd_delay = NEW_KINPO_DELAY;
+			break;
+		default:
+			lcd->lcd_delay = NORMAL_DELAY;
+			break;
+	}
+}
+
 //#define MICROSECONDS(xx) (((cpu->timer_c->freq * 10 / MHZ_6) * xx) / 10)
 #define MICROSECONDS(xx) (((cpu->timer_c->freq * 10 / MHZ_6) * NORMAL_DELAY) / 10) + (xx - NORMAL_DELAY)
 //static FILE *log;
@@ -94,6 +114,7 @@ LCD_t* LCD_init(CPU_t* cpu, int model) {
 		case TI_82:
 		case TI_83:
 			lcd->base_level = BASE_LEVEL_83;
+			lcd->driver_type = LCD_DRIVER_T6A04;
 			break;
 		//v2 of the 81 will come in as an 82/83
 		case TI_81:
@@ -101,17 +122,22 @@ LCD_t* LCD_init(CPU_t* cpu, int model) {
 		case TI_86:
 			lcd->base_level = BASE_LEVEL_83P;
 			lcd->contrast = lcd->base_level;
+			lcd->driver_type = LCD_DRIVER_T6A04;
 			break;
 		case TI_73:
 		case TI_83P:
 			lcd->base_level = BASE_LEVEL_83P;
+			lcd->driver_type = LCD_DRIVER_T6A04;
 			break;
 		case TI_83PSE:
 		case TI_84P:
+		case TI_84PSE:
 			lcd->base_level = BASE_LEVEL_83PSE;
+			lcd->driver_type = LCD_DRIVER_NT7564H;
 			break;
 		default:
 			lcd->base_level = BASE_LEVEL_83P;
+			lcd->driver_type = LCD_DRIVER_T6A04;
 			break;
 	}
 
@@ -131,7 +157,7 @@ LCD_t* LCD_init(CPU_t* cpu, int model) {
 	lcd->shades = LCD_DEFAULT_SHADES;
 	lcd->mode = MODE_PERFECT_GRAY;
 	lcd->steady_frame = 1.0 / FPS;
-	lcd->lcd_delay = NORMAL_DELAY;
+	LCD_update_delay(lcd);
 #endif
 	if (lcd->shades > LCD_MAX_SHADES)
 		lcd->shades = LCD_MAX_SHADES;
@@ -154,7 +180,7 @@ void LCD_timer_refresh(CPU_t * cpu) {
 	lcd->lastgifframe = tc_elapsed(cpu->timer_c);
 	lcd->write_avg = 0.0f;
 	lcd->write_last = tc_elapsed(cpu->timer_c);
-	lcd->lcd_delay = NORMAL_DELAY;
+	LCD_update_delay(lcd);
 }
 
 /* 

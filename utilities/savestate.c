@@ -656,6 +656,7 @@ void SaveLCD(SAVESTATE_t* save, LCD_t* lcd) {
 	WriteDouble(chunk, lcd->lastgifframe);
 	WriteDouble(chunk, lcd->write_avg);
 	WriteDouble(chunk, lcd->write_last);
+	WriteInt(chunk, lcd->driver_type);
 }
 
 SAVESTATE_t* SaveSlot(void *lpInput) {
@@ -899,6 +900,10 @@ void LoadLCD(SAVESTATE_t* save, LCD_t* lcd) {
 	lcd->lastgifframe= ReadDouble(chunk);
 	lcd->write_avg	= ReadDouble(chunk);
 	lcd->write_last = ReadDouble(chunk);
+	if (chunk->pnt < chunk->size) {
+		lcd->driver_type = (LCD_DRIVER_TYPE) ReadInt(chunk);
+		LCD_update_delay(lcd);
+	}
 }
 
 

@@ -52,6 +52,10 @@ enum
 	ID_Calc_Connect,
 	ID_Calc_Options,
 	
+	ID_LCD_Driver_T6A04,
+	ID_LCD_Driver_NT7564H,
+	ID_LCD_Driver_New_Kinpo,
+	
 	ID_Speed_400,
 	ID_Speed_500,
 	ID_Speed_200,
@@ -99,6 +103,10 @@ BEGIN_EVENT_TABLE(WabbitemuFrame, wxFrame)
 	EVT_MENU(ID_Size_200, WabbitemuFrame::OnSetSize)
 	EVT_MENU(ID_Size_300, WabbitemuFrame::OnSetSize)
 	EVT_MENU(ID_Size_400, WabbitemuFrame::OnSetSize)
+	
+	EVT_MENU(ID_LCD_Driver_T6A04, WabbitemuFrame::OnSetLCDDriver)
+	EVT_MENU(ID_LCD_Driver_NT7564H, WabbitemuFrame::OnSetLCDDriver)
+	EVT_MENU(ID_LCD_Driver_New_Kinpo, WabbitemuFrame::OnSetLCDDriver)
 	
 	EVT_MENU(ID_Debug_Reset, WabbitemuFrame::OnDebugReset)
 	EVT_MENU(ID_Debug_Open, WabbitemuFrame::OnDebugOpen)
@@ -293,6 +301,13 @@ void WabbitemuFrame::gui_frame_update() {
 		wxSize skinSize(350, 725);
 		this->SetClientSize(skinSize);
 	}
+	
+	if (wxMenu != NULL) {
+		wxMenu->Check(ID_LCD_Driver_T6A04, lpCalc->cpu.pio.lcd->driver_type == LCD_DRIVER_T6A04);
+		wxMenu->Check(ID_LCD_Driver_NT7564H, lpCalc->cpu.pio.lcd->driver_type == LCD_DRIVER_NT7564H);
+		wxMenu->Check(ID_LCD_Driver_New_Kinpo, lpCalc->cpu.pio.lcd->driver_type == LCD_DRIVER_NEW_KINPO);
+	}
+
 	wxLCD->SetClientSize(lpCalc->LCDRect.GetSize());
 	wxLCD->Raise();
 	this->SendSizeEvent();
@@ -417,6 +432,21 @@ WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wab
 	
 	wxMenu *m_sizeMenu = new wxMenu();
 	m_calcMenu->Append(-1,wxT("Size"), m_sizeMenu);
+	
+	wxMenu *m_lcdDriverMenu = new wxMenu();
+	m_calcMenu->Append(-1, wxT("LCD Driver"), m_lcdDriverMenu);
+	
+	wxMenuItem* m_lcdDriverT6A04;
+	m_lcdDriverT6A04 = new wxMenuItem( m_lcdDriverMenu, ID_LCD_Driver_T6A04, wxString( wxT("Toshiba T6A04 (Standard)") ) , wxEmptyString, wxITEM_CHECK );
+	m_lcdDriverMenu->Append( m_lcdDriverT6A04 );
+	
+	wxMenuItem* m_lcdDriverNT7564H;
+	m_lcdDriverNT7564H = new wxMenuItem( m_lcdDriverMenu, ID_LCD_Driver_NT7564H, wxString( wxT("Novatek NT7564H (Faster)") ) , wxEmptyString, wxITEM_CHECK );
+	m_lcdDriverMenu->Append( m_lcdDriverNT7564H );
+	
+	wxMenuItem* m_lcdDriverNewKinpo;
+	m_lcdDriverNewKinpo = new wxMenuItem( m_lcdDriverMenu, ID_LCD_Driver_New_Kinpo, wxString( wxT("New Kinpo (Fastest)") ) , wxEmptyString, wxITEM_CHECK );
+	m_lcdDriverMenu->Append( m_lcdDriverNewKinpo );
 	
 	wxMenuItem* m_setSize100;
 	m_setSize100 = new wxMenuItem( m_sizeMenu, ID_Size_100, wxString( wxT("100%") ) , wxEmptyString, wxITEM_CHECK );
@@ -620,6 +650,31 @@ All Files (*.*)|*.*\0");
 
 void WabbitemuFrame::OnFileClose(wxCommandEvent &event) {
 	Close(TRUE);
+}
+
+void WabbitemuFrame::OnSetLCDDriver(wxCommandEvent &event) {
+	wxMenuBar *wxMenu = this->GetMenuBar();
+	LCD_t *lcd = lpCalc->cpu.pio.lcd;
+	int eventID = event.GetId();
+	
+	switch (eventID) {
+		case ID_LCD_Driver_T6A04:
+			lcd->driver_type = LCD_DRIVER_T6A04;
+			break;
+		case ID_LCD_Driver_NT7564H:
+			lcd->driver_type = LCD_DRIVER_NT7564H;
+			break;
+		case ID_LCD_Driver_New_Kinpo:
+			lcd->driver_type = LCD_DRIVER_NEW_KINPO;
+			break;
+	}
+	LCD_update_delay(lcd);
+	
+	if (wxMenu != NULL) {
+		wxMenu->Check(ID_LCD_Driver_T6A04, lcd->driver_type == LCD_DRIVER_T6A04);
+		wxMenu->Check(ID_LCD_Driver_NT7564H, lcd->driver_type == LCD_DRIVER_NT7564H);
+		wxMenu->Check(ID_LCD_Driver_New_Kinpo, lcd->driver_type == LCD_DRIVER_NEW_KINPO);
+	}
 }
 
 void WabbitemuFrame::OnSetSize(wxCommandEvent &event) {

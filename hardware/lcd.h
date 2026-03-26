@@ -55,6 +55,12 @@ typedef enum _LCD_MODE {
 	MODE_GAME_GRAY,
 } LCD_MODE;
 
+typedef enum _LCD_DRIVER_TYPE {
+	LCD_DRIVER_T6A04 = 0,
+	LCD_DRIVER_NT7564H,
+	LCD_DRIVER_NEW_KINPO,
+} LCD_DRIVER_TYPE;
+
 
 /* Main structure describing all attributes specific to one LCD,
  * additionally calculation buffers (such as screen) are stored
@@ -67,6 +73,7 @@ typedef struct LCD {
 	int x, y, z;					/* LCD cursors */
 	int width;
 	u_int lcd_delay;				//delay in tstate required to write
+	LCD_DRIVER_TYPE driver_type;
 	
 	LCD_CURSOR_MODE cursor_mode;	/* Y_UP, Y_DOWN, X_UP, X_DOWN */
 	u_int last_read;				/* Buffer previous read */
@@ -92,6 +99,7 @@ LCD_t *LCD_init(CPU_t *, int);
 void LCD_timer_refresh(CPU_t *);
 void LCD_command(CPU_t *, device_t *);
 void LCD_data(CPU_t *, device_t *);
+void LCD_update_delay(LCD_t *);
 
 /* Interface functions */
 uint8_t *LCD_image(LCD_t *);
