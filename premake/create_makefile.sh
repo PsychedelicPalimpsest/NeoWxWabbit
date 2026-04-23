@@ -16,7 +16,8 @@ echo " ** Creating Makefiles..."
 # Add wxWidgetsVer.make
 ########################
 echo " ** Adding dynamic wxWidgets version detection..."
-echo "# NOTE - this file has been modified to allow building with 2.8 and 3.0
+cp -f wxWidgetsVer.make ../build/wxWidgetsVer.make
+echo "# NOTE - this file has been modified to allow building with 3.2, 3.0, and 2.8
 # Regenerating the Makefile will overwrite this change!
 
 include wxWidgetsVer.make
