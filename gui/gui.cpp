@@ -313,7 +313,7 @@ void WabbitemuFrame::gui_frame_update() {
 	this->SendSizeEvent();
 }
 
-WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wabbitemu"))
+WabbitemuFrame::WabbitemuFrame(LPCALC lpCalc) : wxFrame(NULL, wxID_ANY, wxT("Wabbitemu")), wxLCD(NULL), skinWindow(NULL), is_resizing(false), varTree(NULL)
 {
 	this->lpCalc = lpCalc;
 	this->skinWindow = new SkinWindow(this, lpCalc);
